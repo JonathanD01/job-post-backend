@@ -1,0 +1,75 @@
+package no.jobbscraper.jobpostapi.jobpost;
+
+import jakarta.validation.Valid;
+import no.jobbscraper.jobpostapi.response.Response;
+import no.jobbscraper.jobpostapi.response.ResponseUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("api/v1/jobposts")
+public class JobPostController {
+
+    private final JobPostService jobPostService;
+    private final ResponseUtil responseUtil;
+
+    public JobPostController(JobPostService jobPostService, ResponseUtil responseUtil) {
+        this.jobPostService = jobPostService;
+        this.responseUtil = responseUtil;
+    }
+
+    /**
+     * Retrieves a paginated list of job posts based on the provided criteria.
+     *
+     * @param jobPostGetRequest The criteria for filtering job posts.
+     * @param page              The page number for pagination.
+     * @param size              The number of job posts per page.
+     * @return                  A ResponseEntity containing a Response object with the paginated list of job posts.
+     */
+    @GetMapping
+    public ResponseEntity<Response<Page<JobPostDto>>> getAllJobPosts(
+            @ModelAttribute JobPostGetRequest jobPostGetRequest,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "12") int size
+    ) {
+        Page<JobPostDto> jobPosts = jobPostService.getAllJobPosts(jobPostGetRequest, page, size);
+
+        if (jobPosts.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(responseUtil.buildSuccessResponse(jobPosts));
+    }
+
+    /**
+     * Retrieves a single job post by its ID.
+     *
+     * @param jobPostId The ID of the job post to retrieve.
+     * @return          A ResponseEntity containing a Response object with the requested job post.
+     */
+    @GetMapping("{jobPostId}")
+    public ResponseEntity<Response<JobPostDto>> getJobPostFromId(
+            @PathVariable("jobPostId") Long jobPostId) {
+        JobPostDto jobPost = jobPostService.getJobPostFromId(jobPostId);
+
+        return ResponseEntity.ok(responseUtil.buildSuccessResponse(jobPost));
+    }
+
+    /**
+     * Creates new job posts based on the provided request.
+     *
+     * @param createRequest The request containing the details of the job posts to create.
+     * @return              A ResponseEntity containing a Response object with the IDs of the created job posts.
+     */
+    @PostMapping
+    public ResponseEntity<Response<List<Long>>> createJobPosts(
+            @Valid @RequestBody JobPostCreateRequest createRequest
+    ) {
+        List<Long> jobPostIds = jobPostService.createJobPosts(createRequest);
+
+        return ResponseEntity.ok(responseUtil.buildSuccessResponse(jobPostIds));
+    }
+}

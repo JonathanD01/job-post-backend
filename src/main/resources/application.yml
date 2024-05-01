@@ -1,0 +1,28 @@
+cors:
+  allowed-origins: "http://localhost:5173,http://localhost:4173,http://localhost:8000,http://192.168.86.28:8000"
+  allowed-methods: "GET"
+  allowed-headers: "*"
+  exposed-headers: "*"
+
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+spring:
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5431/testdb
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
