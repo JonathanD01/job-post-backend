@@ -1,6 +1,7 @@
 package no.jobbscraper.jobpostapi.jobpost;
 
 import net.datafaker.Faker;
+import no.jobbscraper.jobpostapi.exception.BadSecretKeyException;
 import no.jobbscraper.jobpostapi.exception.JobPostNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,10 +14,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -24,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 class JobPostServiceTest {
 
     private Faker faker;
@@ -42,6 +47,7 @@ class JobPostServiceTest {
     @BeforeEach
     void setUp() {
         faker = new Faker();
+        ReflectionTestUtils.setField(underTest, "secretKey", "mySuperSecretKey");
     }
 
     @Test
@@ -120,13 +126,15 @@ class JobPostServiceTest {
 
         JobPostCreateRequest jobPostCreateRequest = new JobPostCreateRequest(jobPostCreateDtos);
 
+        String secretKey = "mySuperSecretKey";
+
         JobPost jobPostWithId = JobPostUtil.getJobPost();
         jobPostWithId.setId(faker.random().nextLong(1, 100));
 
         // When
         when(jobPostRepository.save(any())).thenReturn(jobPostWithId);
 
-        List<Long> response = underTest.createJobPosts(jobPostCreateRequest);
+        List<Long> response = underTest.createJobPosts(jobPostCreateRequest, secretKey);
 
         // Then
         assertThat(response.size()).isEqualTo(jobPostCreateDtos.size());
@@ -138,10 +146,40 @@ class JobPostServiceTest {
         // Given
         JobPostCreateRequest jobPostCreateRequest = new JobPostCreateRequest(Collections.emptyList());
 
+        String secretKey = "mySuperSecretKey";
+
         // When
-        List<Long> response = underTest.createJobPosts(jobPostCreateRequest);
+        List<Long> response = underTest.createJobPosts(jobPostCreateRequest, secretKey);
 
         // Then
         assertThat(response.size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("It not should create any job post(s) if secret key is invalid")
+    void itShouldNotCreateJobPostsIfSecretKeyInvalid() {
+        // Given
+        JobPostCreateRequest jobPostCreateRequest = new JobPostCreateRequest(Collections.emptyList());
+        String givenSecretKey = UUID.randomUUID().toString();
+
+        // When
+        // Then
+        assertThatThrownBy(() -> underTest.createJobPosts(jobPostCreateRequest, givenSecretKey))
+                .isInstanceOf(BadSecretKeyException.class)
+                .hasMessage("Invalid access");
+    }
+
+    @Test
+    @DisplayName("It not should create any job post(s) if secret key is null")
+    void itShouldNotCreateJobPostsIfSecretKeyNull() {
+        // Given
+        JobPostCreateRequest jobPostCreateRequest = new JobPostCreateRequest(Collections.emptyList());
+        String givenSecretKey = null;
+
+        // When
+        // Then
+        assertThatThrownBy(() -> underTest.createJobPosts(jobPostCreateRequest, givenSecretKey))
+                .isInstanceOf(BadSecretKeyException.class)
+                .hasMessage("Invalid access");
     }
 }

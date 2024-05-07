@@ -1,6 +1,7 @@
 package no.jobbscraper.jobpostapi.jobpost;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import no.jobbscraper.jobpostapi.response.Response;
 import no.jobbscraper.jobpostapi.response.ResponseUtil;
 import org.springframework.data.domain.Page;
@@ -66,9 +67,10 @@ public class JobPostController {
      */
     @PostMapping
     public ResponseEntity<Response<List<Long>>> createJobPosts(
-            @Valid @RequestBody JobPostCreateRequest createRequest
+            @Valid @RequestBody JobPostCreateRequest createRequest,
+            @RequestParam("secretkey") String secretKey
     ) {
-        List<Long> jobPostIds = jobPostService.createJobPosts(createRequest);
+        List<Long> jobPostIds = jobPostService.createJobPosts(createRequest, secretKey);
 
         return ResponseEntity.ok(responseUtil.buildSuccessResponse(jobPostIds));
     }

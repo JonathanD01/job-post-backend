@@ -1,4 +1,4 @@
-secret_key: "abc"
+secret_key: "hello"
 
 cors:
   allowed-origins: "http://localhost:3000"
@@ -14,17 +14,12 @@ spring:
   threads:
     virtual:
       enabled: true
-  datasource:
-    url: jdbc:postgresql://localhost:5431/testdb
-    username: admin
-    password: admin
-    driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true

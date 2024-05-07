@@ -1,7 +1,9 @@
 package no.jobbscraper.jobpostapi.jobpost;
 
 import jakarta.transaction.Transactional;
+import no.jobbscraper.jobpostapi.exception.BadSecretKeyException;
 import no.jobbscraper.jobpostapi.exception.JobPostNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,6 +21,9 @@ public class JobPostService {
     private final JobTagRepository jobTagRepository;
     private final JobDefinitionRepository jobDefinitionRepository;
     private final JobPostDtoMapper jobPostDTOMapper;
+
+    @Value("${secret_key}")
+    private String secretKey;
 
     public JobPostService(JobPostRepository jobPostRepository,
                           JobTagRepository jobTagRepository,
@@ -72,12 +77,17 @@ public class JobPostService {
     /**
      * Creates {@link JobPost} based on the provided {@link JobPostCreateRequest}.
      *
-     * @param createRequest The request containing the job post data.
-     * @return              A list of IDs of the created job posts.
+     * @param createRequest     The request containing the job post data.
+     * @param givenSecretKey    Secret key required for creating the job data.
+     * @return                  A list of IDs of the created job posts.
      * @see JobPost
      * @see JobPostCreateRequest
      */
-    public List<Long> createJobPosts(JobPostCreateRequest createRequest) {
+    public List<Long> createJobPosts(JobPostCreateRequest createRequest, String givenSecretKey) {
+        if (givenSecretKey == null || !givenSecretKey.equalsIgnoreCase(secretKey)){
+            throw new BadSecretKeyException();
+        }
+
         return createRequest.jobPosts().stream()
                 .filter(jobPostCreateDto -> doesJobPostNotExistByUrl(jobPostCreateDto.url()))
                 .map(this::buildJobPostFromDto)

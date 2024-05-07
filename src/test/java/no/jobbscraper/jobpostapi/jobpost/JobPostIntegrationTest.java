@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,9 @@ class JobPostIntegrationTest {
 
     @Container
     private static PostgreSQLContainer<?> psql = new PostgreSQLContainer<>("postgres:latest");
+
+    @Value("${secret_key}")
+    private String secretKey;
 
     @DynamicPropertySource
     static void configureTestcontainersProperties(DynamicPropertyRegistry registry) {
@@ -165,7 +169,7 @@ class JobPostIntegrationTest {
         // When
         // Then
         webTestClient.method(HttpMethod.POST)
-                .uri(JOB_POST_PAH)
+                .uri(JOB_POST_PAH + "?secretkey={secretkey}", secretKey)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(jobPostCreateRequest), JobPostCreateRequest.class)
