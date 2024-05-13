@@ -67,7 +67,7 @@ class JobPostIntegrationTest {
     }
 
     @Test
-    @DisplayName("It should get a list of jobposts which are ordered by deadline in desc order")
+    @DisplayName("It should get a list of jobposts that are ordered by deadline in desc order")
     void itShouldGetAllJobPosts() {
         // Given
         int page = 0;
@@ -88,8 +88,8 @@ class JobPostIntegrationTest {
                 .jsonPath("$.result.pageable.pageSize").isEqualTo(size)
                 .jsonPath("$.result.numberOfElements").isEqualTo(size)
                 .jsonPath("$.result.content").isNotEmpty()
-                .jsonPath("$.result.content[0].deadline_valid").isEqualTo(true)
-                .jsonPath("$.result.content[0].deadline").isNotEmpty();
+                .jsonPath("$.result.content[0].deadline").isNotEmpty()
+                .jsonPath("$.result.content[0].deadline_valid").isEqualTo(true);
     }
 
     @Test

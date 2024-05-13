@@ -29,27 +29,15 @@ public class JobPostSpecifications {
      */
     public static Specification<JobPost> hasDeadlineNotPassed() {
         return (root, query, cb) -> {
-            Predicate deadlineNotPassed = cb.greaterThanOrEqualTo(root.get("deadline"), LocalDate.now());
-            Predicate invalidDeadline = cb.isFalse(root.get("deadlineValid"));
-
-            Order[] orders = {cb.asc(root.get("deadline")), cb.desc(root.get("createdAt"))};
+            Order[] orders = {
+                    cb.asc(root.get("deadline")),
+                    cb.desc(root.get("createdAt"))
+            };
 
             return query
-                    .where(cb.or(deadlineNotPassed, invalidDeadline))
                     .orderBy(orders)
                     .getRestriction();
         };
-    }
-
-    /**
-     * Specifies a condition where the {@link JobPost} title contains the specified text.
-     *
-     * @param title     The text to search for in the job post's title.
-     * @return          A Specification object representing the condition.
-     * @see JobPost
-     */
-    public static Specification<JobPost> hasTitle(String title) {
-        return (root, query, cb) -> cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%");
     }
 
     /**

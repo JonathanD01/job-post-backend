@@ -46,15 +46,17 @@ public class JobPostService {
      * @see JobPostDto
      */
     public Page<JobPostDto> getAllJobPosts(JobPostGetRequest jobPostGetRequest, int page, int size) {
-        Specification<JobPost> specification = buildBaseSpecification();
-        specification = addQuerySpecifications(specification, jobPostGetRequest);
-        specification = addPositionSpecification(specification, jobPostGetRequest);
-        specification = addSectorSpecification(specification, jobPostGetRequest);
-        specification = addMunicipalitySpecification(specification, jobPostGetRequest);
-        specification = addDeadlineSpecification(specification, jobPostGetRequest);
+        var baseSpecification = buildBaseSpecification();
+
+        var finalSpecification = baseSpecification
+                        .and(addQuerySpecifications(baseSpecification, jobPostGetRequest))
+                        .and(addPositionSpecification(baseSpecification, jobPostGetRequest))
+                        .and(addSectorSpecification(baseSpecification, jobPostGetRequest))
+                        .and(addMunicipalitySpecification(baseSpecification, jobPostGetRequest))
+                        .and(addDeadlineSpecification(baseSpecification, jobPostGetRequest));
 
         return jobPostRepository
-                .findAll(specification, PageRequest.of(page, size))
+                .findAll(finalSpecification, PageRequest.of(page, size))
                 .map(jobPostDTOMapper);
     }
 
@@ -118,11 +120,7 @@ public class JobPostService {
     private Specification<JobPost> addQuerySpecifications(Specification<JobPost> specification, JobPostGetRequest jobPostGetRequest) {
         if (jobPostGetRequest.query() != null) {
             String query = jobPostGetRequest.query();
-            String[] words = query.replaceAll(",", "").split(" ");
-            for (String word : words) {
-                specification = specification.and(JobPostSpecifications.hasTitle(word));
-                specification = specification.or(JobPostSpecifications.hasDescription(word));
-            }
+            return JobPostSpecifications.hasDescription(query);
         }
         return specification;
     }
@@ -137,7 +135,7 @@ public class JobPostService {
      */
     private Specification<JobPost> addPositionSpecification(Specification<JobPost> specification, JobPostGetRequest jobPostGetRequest) {
         if (jobPostGetRequest.position() != null) {
-            return specification.and(JobPostSpecifications.hasPosition(jobPostGetRequest.position()));
+            return JobPostSpecifications.hasPosition(jobPostGetRequest.position());
         }
         return specification;
     }
@@ -152,7 +150,7 @@ public class JobPostService {
      */
     private Specification<JobPost> addSectorSpecification(Specification<JobPost> specification, JobPostGetRequest jobPostGetRequest) {
         if (jobPostGetRequest.sector() != null) {
-            return specification.and(JobPostSpecifications.hasSector(jobPostGetRequest.sector()));
+            return JobPostSpecifications.hasSector(jobPostGetRequest.sector());
         }
         return specification;
     }
@@ -167,7 +165,7 @@ public class JobPostService {
      */
     private Specification<JobPost> addMunicipalitySpecification(Specification<JobPost> specification, JobPostGetRequest jobPostGetRequest) {
         if (jobPostGetRequest.municipality() != null) {
-            return specification.and(JobPostSpecifications.isInMunicipality(jobPostGetRequest.municipality()));
+            return JobPostSpecifications.isInMunicipality(jobPostGetRequest.municipality());
         }
         return specification;
     }
@@ -182,9 +180,9 @@ public class JobPostService {
      */
     private Specification<JobPost> addDeadlineSpecification(Specification<JobPost> specification, JobPostGetRequest jobPostGetRequest) {
         if (jobPostGetRequest.deadline() != null) {
-            return specification.and(JobPostSpecifications.hasDeadline(jobPostGetRequest.deadline()));
+            return JobPostSpecifications.hasDeadline(jobPostGetRequest.deadline());
         } else {
-            return specification.and(JobPostSpecifications.hasDeadlineNotPassed());
+            return JobPostSpecifications.hasDeadlineNotPassed();
         }
     }
 

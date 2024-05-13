@@ -1,0 +1,35 @@
+secret_key: "abc"
+
+cors:
+  allowed-origins: "http://localhost:3000"
+  allowed-methods: "GET"
+  allowed-headers: "*"
+  exposed-headers: "*"
+
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+spring:
+  sql:
+    init:
+      mode: always
+    data-locations: classpath:debug-data.sql
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5431/debugdb
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    defer-datasource-initialization: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
