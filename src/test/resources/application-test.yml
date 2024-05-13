@@ -11,6 +11,8 @@ server:
     include-message: always
     include-binding-errors: always
 spring:
+  flyway:
+    enabled: false
   threads:
     virtual:
       enabled: true
