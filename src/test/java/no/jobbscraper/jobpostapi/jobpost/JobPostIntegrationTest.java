@@ -88,8 +88,8 @@ class JobPostIntegrationTest {
                 .jsonPath("$.result.pageable.pageSize").isEqualTo(size)
                 .jsonPath("$.result.numberOfElements").isEqualTo(size)
                 .jsonPath("$.result.content").isNotEmpty()
-                .jsonPath("$.result.content[0].deadline").isNotEmpty()
-                .jsonPath("$.result.content[0].deadline_valid").isEqualTo(true);
+                .jsonPath("$.result.content[0].deadline").exists()
+                .jsonPath("$.result.content[1].deadline").exists();
     }
 
     @Test
@@ -114,7 +114,7 @@ class JobPostIntegrationTest {
     @DisplayName("It should return a jobpost if id exists")
     void itShouldGetJobPostFromId() {
         // Given
-        int jobPostId = faker.random().nextInt(1, 10);
+        int jobPostId = faker.options().option(new int[]{155, 255, 355, 655, 755, 855, 955, 1550});
 
         // When
         // Then

@@ -35,10 +35,6 @@ public record JobPostCreateDto(
         @NotBlank(message = "Job post must have a description")
         String description,
 
-        @JsonProperty("deadline_valid")
-        @DefaultValue(value = "false")
-        boolean deadlineValid,
-
         @JsonProperty("deadline")
         @Nullable
         LocalDate deadline,

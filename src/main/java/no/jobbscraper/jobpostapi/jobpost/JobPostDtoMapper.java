@@ -19,7 +19,6 @@ public class JobPostDtoMapper implements Function<JobPost, JobPostDto> {
                 jobPost.getImageUrl(),
                 jobPost.getTitle(),
                 jobPost.getDescription(),
-                jobPost.isDeadlineValid(),
                 jobPost.getDeadline(),
                 jobPost.getTags(),
                 jobPost.getJobDefinitions()

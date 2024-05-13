@@ -23,8 +23,6 @@ public record JobPostDto(
         String imageUrl,
         String title,
         String description,
-        @JsonProperty("deadline_valid")
-        boolean deadlineValid,
         @JsonFormat(pattern = "dd-MM-yyyy")
         @DateTimeFormat(pattern = "dd-MM-yyyy")
         LocalDate deadline,

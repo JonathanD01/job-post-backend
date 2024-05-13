@@ -35,8 +35,6 @@ public class JobPost {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    boolean deadlineValid;
-
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate deadline;
 
@@ -64,7 +62,6 @@ public class JobPost {
                    String imageUrl,
                    String title,
                    String description,
-                   boolean deadlineValid,
                    LocalDate deadline,
                    Set<JobTag> jobTags,
                    Set<JobDefinition> jobDefinitions) {
@@ -74,13 +71,12 @@ public class JobPost {
         this.imageUrl = imageUrl;
         this.title = title;
         this.description = description;
-        this.deadlineValid = deadlineValid;
         this.deadline = deadline;
         this.jobTags = jobTags;
         this.jobDefinitions = jobDefinitions;
     }
 
-    public JobPost(Long id, Date createdAt, String url, String companyName, String companyImageUrl, String imageUrl, String title, String description, boolean deadlineValid, LocalDate deadline, Set<JobTag> jobTags, Set<JobDefinition> jobDefinitions) {
+    public JobPost(Long id, Date createdAt, String url, String companyName, String companyImageUrl, String imageUrl, String title, String description, LocalDate deadline, Set<JobTag> jobTags, Set<JobDefinition> jobDefinitions) {
         this.id = id;
         this.createdAt = createdAt;
         this.url = url;
@@ -89,7 +85,6 @@ public class JobPost {
         this.imageUrl = imageUrl;
         this.title = title;
         this.description = description;
-        this.deadlineValid = deadlineValid;
         this.deadline = deadline;
         this.jobTags = jobTags;
         this.jobDefinitions = jobDefinitions;
@@ -155,14 +150,6 @@ public class JobPost {
         this.description = description;
     }
 
-    public boolean isDeadlineValid() {
-        return deadlineValid;
-    }
-
-    public void setDeadlineValid(boolean deadlineValid) {
-        this.deadlineValid = deadlineValid;
-    }
-
     public LocalDate getDeadline() {
         return deadline;
     }
@@ -194,7 +181,6 @@ public class JobPost {
         private String companyName;
         private String companyImageUrl;
         private String description;
-        private boolean deadlineValid;
         private LocalDate deadline;
         private Set<JobTag> jobTags;
         private Set<JobDefinition> jobDefinitions;
@@ -222,11 +208,6 @@ public class JobPost {
             return this;
         }
 
-        public Builder setDeadlineValid(boolean deadlineValid) {
-            this.deadlineValid = deadlineValid;
-            return this;
-        }
-
         public Builder setDeadline(LocalDate deadline) {
             this.deadline = deadline;
             return this;
@@ -244,7 +225,7 @@ public class JobPost {
 
         public JobPost build() {
             return new JobPost(url, companyName, companyImageUrl, imageUrl,
-                    title, description, deadlineValid, deadline, jobTags,
+                    title, description, deadline, jobTags,
                     jobDefinitions);
         }
     }

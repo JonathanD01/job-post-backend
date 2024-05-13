@@ -7,6 +7,7 @@ import no.jobbscraper.jobpostapi.util.GeoUtil;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JobPostSpecifications {
@@ -29,13 +30,19 @@ public class JobPostSpecifications {
      */
     public static Specification<JobPost> hasDeadlineNotPassed() {
         return (root, query, cb) -> {
-            Order[] orders = {
-                    cb.asc(root.get("deadline")),
-                    cb.desc(root.get("createdAt"))
-            };
+            Predicate deadlinePredicate = cb.or(
+                    cb.greaterThanOrEqualTo(root.get("deadline"), LocalDate.now()),
+                    cb.isNull(root.get("deadline")));
+
+            List<Order> orderList = new ArrayList<>();
+            orderList.add(cb.asc(root.get("deadline")));
+            orderList.add(cb.desc(root.get("createdAt")));
+
+            Order[] orders = orderList.toArray(new Order[0]);
 
             return query
                     .orderBy(orders)
+                    .where(deadlinePredicate)
                     .getRestriction();
         };
     }

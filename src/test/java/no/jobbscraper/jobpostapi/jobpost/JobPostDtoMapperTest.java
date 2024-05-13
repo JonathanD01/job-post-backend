@@ -44,14 +44,12 @@ class JobPostDtoMapperTest {
         String imageUrl = faker.internet().image();
         String title = faker.book().title();
         String description = faker.lorem().characters(500, 600);
-        boolean deadlineValid = faker.random().nextBoolean();
         LocalDate deadline = faker.date().birthdayLocalDate();
 
         JobPost jobPost = new JobPost.Builder(url, imageUrl, title)
                 .setDescription(description)
                 .setCompanyName(companyName)
                 .setCompanyImageUrl(companyImageUrl)
-                .setDeadlineValid(deadlineValid)
                 .setDeadline(deadline)
                 .setTags(jobTags)
                 .setJobDefinitions(jobDefinitions)
@@ -67,7 +65,6 @@ class JobPostDtoMapperTest {
         assertThat(response.imageUrl()).isEqualTo(jobPost.getImageUrl());
         assertThat(response.title()).isEqualTo(jobPost.getTitle());
         assertThat(response.description()).isEqualTo(jobPost.getDescription());
-        assertThat(response.deadlineValid()).isEqualTo(jobPost.isDeadlineValid());
         assertThat(response.deadline()).isEqualTo(jobPost.getDeadline());
     }
 

@@ -97,7 +97,6 @@ class JobPostServiceTest {
         assertThat(response.imageUrl()).isEqualTo(jobPost.getImageUrl());
         assertThat(response.title()).isEqualTo(jobPost.getTitle());
         assertThat(response.description()).isEqualTo(jobPost.getDescription());
-        assertThat(response.deadlineValid()).isEqualTo(jobPost.isDeadlineValid());
         assertThat(response.deadline()).isEqualTo(jobPost.getDeadline());
     }
 

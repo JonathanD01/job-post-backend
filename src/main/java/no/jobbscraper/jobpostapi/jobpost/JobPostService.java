@@ -199,7 +199,6 @@ public class JobPostService {
                 .setCompanyImageUrl(jobPostCreateDTO.companyImageUrl())
                 .setCompanyName(jobPostCreateDTO.companyName())
                 .setDescription(jobPostCreateDTO.description())
-                .setDeadlineValid(jobPostCreateDTO.deadlineValid())
                 .setDeadline(jobPostCreateDTO.deadline());
 
         // Save job tags

@@ -47,14 +47,12 @@ public class JobPostUtil {
         String imageUrl = faker.internet().image();
         String title = faker.book().title();
         String description = faker.lorem().characters(500, 600);
-        boolean deadlineValid = faker.random().nextBoolean();
         LocalDate deadline = faker.date().birthdayLocalDate();
 
         return new JobPost.Builder(url, imageUrl, title)
                 .setDescription(description)
                 .setCompanyName(companyName)
                 .setCompanyImageUrl(companyImageUrl)
-                .setDeadlineValid(deadlineValid)
                 .setDeadline(deadline)
                 .setTags(jobTags)
                 .setJobDefinitions(jobDefinitions)
@@ -64,12 +62,12 @@ public class JobPostUtil {
     public static JobPostDto getJobPostDtoFrom(JobPost jobPost) {
         return new JobPostDto(jobPost.getId(), jobPost.getCreatedAt(), jobPost.getUrl(), jobPost.getCompanyName(),
                 jobPost.getCompanyImageUrl(), jobPost.getImageUrl(), jobPost.getTitle(), jobPost.getDescription(),
-                jobPost.isDeadlineValid(), jobPost.getDeadline(), jobPost.getJobTags(), jobPost.getJobDefinitions());
+                jobPost.getDeadline(), jobPost.getJobTags(), jobPost.getJobDefinitions());
     }
 
     public static JobPostCreateDto getJobPostCreateDtoFrom(JobPost jobPost) {
         return new JobPostCreateDto(jobPost.getUrl(), jobPost.getCompanyName(), jobPost.getCompanyImageUrl(),
-                jobPost.getImageUrl(), jobPost.getTitle(), jobPost.getDescription(), jobPost.isDeadlineValid(),
+                jobPost.getImageUrl(), jobPost.getTitle(), jobPost.getDescription(),
                 jobPost.getDeadline(), jobPost.getJobTags(), jobPost.getJobDefinitions());
     }
 

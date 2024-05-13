@@ -14,7 +14,7 @@ spring:
   sql:
     init:
       mode: always
-    data-locations: classpath:debug-data.sql
+    data-locations: classpath:data.sql
   threads:
     virtual:
       enabled: true
