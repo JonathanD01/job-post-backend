@@ -11,6 +11,15 @@ server:
     include-message: always
     include-binding-errors: always
 spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: '0'
+    url: jdbc:postgresql://localhost:5431/testdb
+    password: admin
+    user: admin
+    schemas: migrations
+    locations: classpath:db/migration/postgresql
   threads:
     virtual:
       enabled: true
