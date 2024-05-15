@@ -53,7 +53,7 @@ public class JobPostService {
                         .and(addPositionSpecification(baseSpecification, jobPostGetRequest))
                         .and(addSectorSpecification(baseSpecification, jobPostGetRequest))
                         .and(addMunicipalitySpecification(baseSpecification, jobPostGetRequest))
-                        .and(addDeadlineSpecification(baseSpecification, jobPostGetRequest));
+                        .and(addDeadlineSpecification(jobPostGetRequest));
 
         return jobPostRepository
                 .findAll(finalSpecification, PageRequest.of(page, size))
@@ -173,12 +173,11 @@ public class JobPostService {
     /**
      * Adds deadline specification to the base specification.
      *
-     * @param specification     The base specification to add to.
      * @param jobPostGetRequest The request containing the deadline.
      * @return                  The updated specification.
      * @see JobPost
      */
-    private Specification<JobPost> addDeadlineSpecification(Specification<JobPost> specification, JobPostGetRequest jobPostGetRequest) {
+    private Specification<JobPost> addDeadlineSpecification(JobPostGetRequest jobPostGetRequest) {
         if (jobPostGetRequest.deadline() != null) {
             return JobPostSpecifications.hasDeadline(jobPostGetRequest.deadline());
         } else {

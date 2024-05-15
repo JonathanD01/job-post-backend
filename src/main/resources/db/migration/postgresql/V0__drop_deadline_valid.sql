@@ -1,2 +1,2 @@
-alter table "jobposts"
-    drop column deadline_valid;
+ALTER TABLE "jobposts"
+    DROP COLUMN IF EXISTS deadline_valid;
