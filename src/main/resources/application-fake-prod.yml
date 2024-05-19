@@ -13,10 +13,6 @@ server:
 spring:
   flyway:
     enabled: false
-  sql:
-    init:
-      mode: always
-    data-locations: classpath:data.sql
   threads:
     virtual:
       enabled: true

@@ -205,7 +205,7 @@ public class JobPostService {
             Set<JobTag> jobTagSet = jobPostCreateDTO.jobTags().stream()
                     .map(jobTag -> {
                         String tag = jobTag.getTag();
-                        return jobTagRepository.findByTagLikeIgnoreCase(tag)
+                        return jobTagRepository.findByTag(tag)
                                 .orElseGet(() -> new JobTag(tag));
                     })
                     .collect(Collectors.toSet());
@@ -218,7 +218,7 @@ public class JobPostService {
                     .map(jobDefinition -> {
                         String key = jobDefinition.getKey();
                         String value = jobDefinition.getValue();
-                        return jobDefinitionRepository.findByKeyLikeIgnoreCaseAndValueLikeIgnoreCase(key, value)
+                        return jobDefinitionRepository.findByKeyAndValue(key, value)
                                 .orElseGet(() -> new JobDefinition(key, value));
                     })
                     .collect(Collectors.toSet());

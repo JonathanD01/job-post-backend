@@ -1,6 +1,7 @@
 package no.jobbscraper.jobpostapi.jobpost;
 
 import net.datafaker.Faker;
+import no.jobbscraper.jobpostapi.PostgreSQLContainerInitializer;
 import no.jobbscraper.jobpostapi.response.ResponseType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,45 +9,35 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_CLASS;
 
-@Testcontainers
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@DirtiesContext
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration(initializers = {PostgreSQLContainerInitializer.class})
 @Sql(value = "/test-data.sql", executionPhase = BEFORE_TEST_CLASS)
-class JobPostIntegrationTest {
+class JobPostIntegrationTest  {
 
     private static final String JOB_POST_PAH = "/api/v1/jobposts";
 
-    @Container
-    private static PostgreSQLContainer<?> psql = new PostgreSQLContainer<>("postgres:latest");
-
     @Value("${secret_key}")
     private String secretKey;
-
-    @DynamicPropertySource
-    static void configureTestcontainersProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", psql::getJdbcUrl);
-        registry.add("spring.datasource.username", psql::getUsername);
-        registry.add("spring.datasource.password", psql::getPassword);
-    }
 
     @Autowired
     private JobPostRepository jobPostRepository;
