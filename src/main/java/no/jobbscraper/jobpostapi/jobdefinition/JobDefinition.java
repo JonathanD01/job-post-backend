@@ -1,7 +1,8 @@
-package no.jobbscraper.jobpostapi.jobpost;
+package no.jobbscraper.jobpostapi.jobdefinition;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import no.jobbscraper.jobpostapi.jobpost.JobPost;
 
 import java.util.HashSet;
 import java.util.Set;

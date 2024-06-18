@@ -4,7 +4,7 @@ The Job Post API is a Spring Boot application designed to provide an interface f
 Used with `https://github.com/JonathanD01/job-post-frontend`
 
 ## Requirements
-* JDK 21
+* JDK 17
 * Maven
 * Docker (for containerization)
 

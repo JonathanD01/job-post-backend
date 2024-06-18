@@ -3,6 +3,8 @@ package no.jobbscraper.jobpostapi.jobpost;
 import net.datafaker.Faker;
 import no.jobbscraper.jobpostapi.exception.BadSecretKeyException;
 import no.jobbscraper.jobpostapi.exception.JobPostNotFoundException;
+import no.jobbscraper.jobpostapi.jobdefinition.JobDefinitionRepository;
+import no.jobbscraper.jobpostapi.jobtag.JobTagRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.quickperf.junit5.QuickPerfTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -25,10 +28,11 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
+@QuickPerfTest
 class JobPostServiceTest {
 
     private Faker faker;
@@ -116,7 +120,7 @@ class JobPostServiceTest {
     }
 
     @Test
-    @DisplayName("It should create job post(s)")
+    @DisplayName("It should create job posts")
     void itShouldCreateJobPosts() {
         // Given
         List<JobPostCreateDto> jobPostCreateDtos = JobPostUtil.getJobPosts(faker.random().nextInt(15, 30)).stream()
@@ -131,16 +135,14 @@ class JobPostServiceTest {
         jobPostWithId.setId(faker.random().nextLong(1, 100));
 
         // When
-        when(jobPostRepository.save(any())).thenReturn(jobPostWithId);
-
-        List<Long> response = underTest.createJobPosts(jobPostCreateRequest, secretKey);
+        underTest.createJobPosts(jobPostCreateRequest, secretKey);
 
         // Then
-        assertThat(response.size()).isEqualTo(jobPostCreateDtos.size());
+        verify(jobPostRepository, times(1)).saveAll(any());
     }
 
     @Test
-    @DisplayName("It not should create any job post(s)")
+    @DisplayName("It not should create any job posts")
     void itShouldNotCreateJobPosts() {
         // Given
         JobPostCreateRequest jobPostCreateRequest = new JobPostCreateRequest(Collections.emptyList());
@@ -155,7 +157,7 @@ class JobPostServiceTest {
     }
 
     @Test
-    @DisplayName("It not should create any job post(s) if secret key is invalid")
+    @DisplayName("It not should create any job posts if secret key is invalid")
     void itShouldNotCreateJobPostsIfSecretKeyInvalid() {
         // Given
         JobPostCreateRequest jobPostCreateRequest = new JobPostCreateRequest(Collections.emptyList());
@@ -169,7 +171,7 @@ class JobPostServiceTest {
     }
 
     @Test
-    @DisplayName("It not should create any job post(s) if secret key is null")
+    @DisplayName("It not should create any job posts if secret key is null")
     void itShouldNotCreateJobPostsIfSecretKeyNull() {
         // Given
         JobPostCreateRequest jobPostCreateRequest = new JobPostCreateRequest(Collections.emptyList());

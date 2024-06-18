@@ -1,7 +1,8 @@
 package no.jobbscraper.jobpostapi.jobpost;
 
 import net.datafaker.Faker;
-import org.assertj.core.api.Assertions;
+import no.jobbscraper.jobpostapi.jobdefinition.JobDefinition;
+import no.jobbscraper.jobpostapi.jobtag.JobTag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,6 +67,8 @@ class JobPostDtoMapperTest {
         assertThat(response.title()).isEqualTo(jobPost.getTitle());
         assertThat(response.description()).isEqualTo(jobPost.getDescription());
         assertThat(response.deadline()).isEqualTo(jobPost.getDeadline());
+        assertThat(response.jobTags().size()).isEqualTo(jobTags.size());
+        assertThat(response.jobDefinitions().size()).isEqualTo(jobDefinitions.size());
     }
 
     @Test

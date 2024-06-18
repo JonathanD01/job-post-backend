@@ -3,6 +3,8 @@ package no.jobbscraper.jobpostapi.jobpost;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import no.jobbscraper.jobpostapi.jobdefinition.JobDefinition;
+import no.jobbscraper.jobpostapi.jobtag.JobTag;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;

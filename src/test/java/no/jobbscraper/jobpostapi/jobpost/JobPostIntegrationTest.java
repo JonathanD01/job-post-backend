@@ -7,10 +7,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.quickperf.junit5.QuickPerfTest;
+import org.quickperf.spring.sql.QuickPerfSqlConfig;
+import org.quickperf.sql.annotation.ExpectSelect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -26,12 +30,14 @@ import java.util.List;
 
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_CLASS;
 
+@Import(QuickPerfSqlConfig.class)
 @ActiveProfiles("test")
 @DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = {PostgreSQLContainerInitializer.class})
 @Sql(value = "/test-data.sql", executionPhase = BEFORE_TEST_CLASS)
+@QuickPerfTest
 class JobPostIntegrationTest  {
 
     private static final String JOB_POST_PAH = "/api/v1/jobposts";
@@ -59,6 +65,7 @@ class JobPostIntegrationTest  {
 
     @Test
     @DisplayName("It should get a list of jobposts that are ordered by deadline in desc order")
+    @ExpectSelect(2)
     void itShouldGetAllJobPosts() {
         // Given
         int page = 0;
@@ -85,6 +92,7 @@ class JobPostIntegrationTest  {
 
     @Test
     @DisplayName("It should return a no content response if jobposts are empty")
+    @ExpectSelect(2)
     void itShouldNotGetAllJobPosts() {
         // Given
         int page = faker.random().nextInt(10, 20);
@@ -103,6 +111,7 @@ class JobPostIntegrationTest  {
 
     @Test
     @DisplayName("It should return a jobpost if id exists")
+    @ExpectSelect
     void itShouldGetJobPostFromId() {
         // Given
         int jobPostId = faker.options().option(new int[]{155, 255, 355, 655, 755, 855, 955, 1550});
@@ -127,6 +136,7 @@ class JobPostIntegrationTest  {
 
     @Test
     @DisplayName("It should not return a jobpost if id doesn't exist")
+    @ExpectSelect
     void itShouldNotGetJobPostFromId() {
         // Given
         int jobPostId = faker.random().nextInt(100, 500);
@@ -149,9 +159,10 @@ class JobPostIntegrationTest  {
     }
 
     @Test
+    @DisplayName("It should create job posts")
     void itShouldCreateJobPost() {
         // Given
-        List<JobPostCreateDto> jobPostCreateDtos = JobPostUtil.getJobPosts(faker.random().nextInt(15, 30)).stream()
+        List<JobPostCreateDto> jobPostCreateDtos = JobPostUtil.getJobPosts(30).stream()
                 .map(JobPostUtil::getJobPostCreateDtoFrom)
                 .toList();
 

@@ -3,6 +3,8 @@ package no.jobbscraper.jobpostapi.jobpost;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
+import no.jobbscraper.jobpostapi.jobdefinition.JobDefinition;
+import no.jobbscraper.jobpostapi.jobtag.JobTag;
 import org.hibernate.annotations.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -38,13 +40,15 @@ public class JobPost {
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate deadline;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.LAZY)
     @JoinTable(name = "j_jobpost_tags",
             joinColumns = { @JoinColumn(name = "jobpost_id") },
             inverseJoinColumns = { @JoinColumn(name = "jobtag_id") })
     private Set<JobTag> jobTags = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.LAZY)
     @JoinTable(name = "j_jobpost_descriptions",
             joinColumns = { @JoinColumn(name = "jobpost_id") },
             inverseJoinColumns = { @JoinColumn(name = "jobdescription_id") })

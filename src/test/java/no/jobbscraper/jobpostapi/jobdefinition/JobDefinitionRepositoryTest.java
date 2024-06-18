@@ -1,11 +1,15 @@
-package no.jobbscraper.jobpostapi.jobpost;
+package no.jobbscraper.jobpostapi.jobdefinition;
 
 import no.jobbscraper.jobpostapi.PostgreSQLContainerInitializer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.quickperf.junit5.QuickPerfTest;
+import org.quickperf.spring.sql.QuickPerfSqlConfig;
+import org.quickperf.sql.annotation.ExpectSelect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,12 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_CLASS;
 
+@Import(QuickPerfSqlConfig.class)
 @DataJpaTest
 @DirtiesContext
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = {PostgreSQLContainerInitializer.class})
 @ActiveProfiles("test")
 @Sql(value = "/test-data.sql", executionPhase = BEFORE_TEST_CLASS)
+@QuickPerfTest
 class JobDefinitionRepositoryTest {
 
     @Autowired
@@ -30,6 +36,7 @@ class JobDefinitionRepositoryTest {
 
     @Test
     @DisplayName("It should find the corresponding definition by lowercase")
+    @ExpectSelect
     void findByKeyAndValueLowerCase() {
         // Given
         String key = "location";
@@ -46,6 +53,7 @@ class JobDefinitionRepositoryTest {
 
     @Test
     @DisplayName("It should find the corresponding definition by uppercase")
+    @ExpectSelect
     void findByKeyAndValueUpperCase() {
         // Given
         String key = "CATEGORY";
@@ -62,6 +70,7 @@ class JobDefinitionRepositoryTest {
 
     @Test
     @DisplayName("It should find the corresponding definition by both lower- and uppercase")
+    @ExpectSelect
     void findByKeyAndValueLowerAndUpperCase() {
         // Given
         String key = "cAtEgOrY";

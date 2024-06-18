@@ -1,4 +1,4 @@
-package no.jobbscraper.jobpostapi.jobpost;
+package no.jobbscraper.jobpostapi.jobdefinition;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

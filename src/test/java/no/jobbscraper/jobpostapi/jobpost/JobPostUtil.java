@@ -1,19 +1,23 @@
 package no.jobbscraper.jobpostapi.jobpost;
 
-import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
 import net.datafaker.Faker;
-import org.springframework.boot.json.GsonJsonParser;
+import no.jobbscraper.jobpostapi.jobdefinition.JobDefinition;
+import no.jobbscraper.jobpostapi.jobtag.JobTag;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class JobPostUtil {
 
     private static final Faker faker = new Faker();
+
+    private static final SecureRandom secureRandom = new SecureRandom();
 
     private JobPostUtil() {
         throw new AssertionError("Cannot initialize this class");
@@ -30,16 +34,19 @@ public class JobPostUtil {
 
     public static JobPost getJobPost() {
         Set<JobTag> jobTags = Stream.of(
-                        faker.food().ingredient(),
-                        faker.food().allergen(),
-                        faker.food().dish())
+                        faker.lorem().characters(randomInt()),
+                        faker.lorem().characters(randomInt()),
+                        faker.lorem().characters(randomInt()))
                 .map(JobTag::new)
                 .collect(Collectors.toSet());
 
         Set<JobDefinition> jobDefinitions = Set.of(
-                new JobDefinition(faker.job().title(), faker.job().keySkills()),
-                new JobDefinition(faker.esports().game(), faker.esports().player()),
-                new JobDefinition(faker.money().currency(), faker.money().currencyCode()));
+                new JobDefinition(faker.lorem().characters(randomInt()),
+                        faker.lorem().characters(randomInt())),
+                new JobDefinition(faker.lorem().characters(randomInt()),
+                        faker.lorem().characters(randomInt())),
+                new JobDefinition(faker.lorem().characters(randomInt()),
+                        faker.lorem().characters(randomInt())));
 
         String url = faker.internet().url();
         String companyName = faker.company().name();
@@ -69,6 +76,10 @@ public class JobPostUtil {
         return new JobPostCreateDto(jobPost.getUrl(), jobPost.getCompanyName(), jobPost.getCompanyImageUrl(),
                 jobPost.getImageUrl(), jobPost.getTitle(), jobPost.getDescription(),
                 jobPost.getDeadline(), jobPost.getJobTags(), jobPost.getJobDefinitions());
+    }
+
+    private static int randomInt() {
+        return secureRandom.nextInt(1, 200);
     }
 
 }

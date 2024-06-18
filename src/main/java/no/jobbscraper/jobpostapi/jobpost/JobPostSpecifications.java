@@ -3,6 +3,7 @@ package no.jobbscraper.jobpostapi.jobpost;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
+import no.jobbscraper.jobpostapi.jobdefinition.JobDefinition;
 import no.jobbscraper.jobpostapi.util.GeoUtil;
 import org.springframework.data.jpa.domain.Specification;
 

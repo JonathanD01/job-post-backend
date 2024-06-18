@@ -1,3 +1,13 @@
+quickperf:
+  enabled: true
+
+logging:
+  level:
+    org.hibernate.stat: DEBUG
+    org.hibernate.sql: DEBUG
+    org.springframework.web.reactive.function.client: DEBUG
+    org.springframework.http: TRACE
+
 secret_key: "hello"
 
 cors:
@@ -21,7 +31,4 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: create-drop
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
+    show-sql: true

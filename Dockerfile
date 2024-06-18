@@ -1,9 +1,28 @@
-FROM openjdk:21-jdk
-
-WORKDIR /app
-
-COPY target/jobpostapi-*.jar /app/jobpostapi.jar
-
+FROM maven:3-eclipse-temurin-17 as build
+RUN mkdir /usr/src/project
+COPY . /usr/src/project
+WORKDIR /usr/src/project
+RUN mvn package -DskipTests
+RUN jar xf target/jobpostapi-*.jar
+RUN jdeps --ignore-missing-deps -q  \
+    --recursive  \
+    --multi-release 17  \
+    --print-module-deps  \
+    --class-path 'BOOT-INF/lib/*'  \
+    target/jobpostapi-*.jar > deps.info
+RUN jlink \
+    --add-modules $(cat deps.info) \
+    --strip-debug \
+    --compress 2 \
+    --no-header-files \
+    --no-man-pages \
+    --output /myjre
+FROM debian:bookworm-slim
+ENV JAVA_HOME /user/java/jdk17
+ENV PATH $JAVA_HOME/bin:$PATH
+COPY --from=build /myjre $JAVA_HOME
+RUN mkdir /project
+COPY --from=build /usr/src/project/target/jobpostapi-*.jar /project/
+WORKDIR /project
 EXPOSE 8080
-
-CMD ["java", "-jar", "jobpostapi.jar"]
+ENTRYPOINT java -jar jobpostapi-*.jar

@@ -21,11 +21,11 @@ public class SecurityConfiguration {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/**")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/actuator/**")
-                        .permitAll()
+                .authorizeHttpRequests(req ->
+                        req.requestMatchers("/api/v1/**")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.GET, "/actuator/**")
+                                .permitAll()
                 )
                 .build();
     }
