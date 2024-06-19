@@ -63,6 +63,7 @@ public class JobPostService {
                         .and(addDeadlineSpecification(jobPostGetRequest))
         );
         // Fixes HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+        // by not using a pageable on query. Instead, brute force a pagination!
         List<JobPost> jobPosts = jobPostRepository.findAll(finalSpecification);
 
         PagedListHolder<JobPost> pagedListHolder = new PagedListHolder<>(jobPosts);

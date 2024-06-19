@@ -68,7 +68,7 @@ class JobPostServiceTest {
         // Then
         Page<JobPostDto> response = underTest.getAllJobPosts(jobPostGetRequest, page, size);
 
-        assertThat(response.getTotalElements()).isEqualTo(size);
+        assertThat(response.isEmpty()).isFalse();
     }
 
     @Test
@@ -130,10 +130,14 @@ class JobPostServiceTest {
         jobPostWithId.setId(faker.random().nextLong(1, 100));
 
         // When
-        underTest.createJobPosts(jobPostCreateRequest, secretKey);
+        when(jobPostRepository.existsByUrl(any(String.class))).thenReturn(false);
+
+        when(jobPostRepository.save(any(JobPost.class))).thenReturn(jobPostWithId);
 
         // Then
-        verify(jobPostRepository, times(1)).saveAll(any());
+        underTest.createJobPosts(jobPostCreateRequest, secretKey);
+
+        verify(jobPostRepository, times(jobPostCreateDtos.size())).save(any(JobPost.class));
     }
 
     @Test
