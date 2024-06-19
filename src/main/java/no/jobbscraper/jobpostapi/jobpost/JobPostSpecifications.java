@@ -1,5 +1,6 @@
 package no.jobbscraper.jobpostapi.jobpost;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
@@ -19,8 +20,11 @@ public class JobPostSpecifications {
      * @return A Specification object representing the condition.
      * @see JobPost
      */
-    public static Specification<JobPost> hasUrl() {
-        return (root, query, cb) -> cb.isNotNull(root.get("url"));
+    public static Specification<JobPost> hasUrl(Specification<JobPost> specification) {
+        return (root, query, cb) -> {
+            query.where(cb.isNotNull(root.get("url")));
+            return specification.toPredicate(root, query, cb);
+        };
     }
 
     /**
@@ -55,8 +59,12 @@ public class JobPostSpecifications {
      * @return          A Specification object representing the condition.
      * @see JobPost
      */
-    public static Specification<JobPost> hasPosition(String position) {
+    public static Specification<JobPost> hasPosition(@Nullable String position) {
         return (root, query, cb) -> {
+            if (position == null) {
+                return cb.conjunction();
+            }
+
             Join<JobPost, JobDefinition> joinJobDescription = root.join("jobDefinitions");
 
             Predicate stillingPredicate = cb.equal(joinJobDescription.get("key"), "Stilling");
@@ -73,8 +81,13 @@ public class JobPostSpecifications {
      * @return A Specification object representing the condition.
      * @see JobPost
      */
-    public static Specification<JobPost> hasDescription(String description) {
-        return (root, query, cb) -> cb.like(cb.lower(root.get("description")),"%" + description.toLowerCase() + "%");
+    public static Specification<JobPost> hasDescription(@Nullable String description) {
+        return (root, query, cb) -> {
+            if (description == null) {
+                return cb.conjunction();
+            }
+            return cb.like(cb.lower(root.get("description")),"%" + description.toLowerCase() + "%");
+        };
     }
 
     /**
@@ -85,8 +98,11 @@ public class JobPostSpecifications {
      * @throws NullPointerException if the list of words for the current municipality is null
      * @see JobPost
      */
-    public static Specification<JobPost> isInMunicipality(String inputMunicipality) {
+    public static Specification<JobPost> isInMunicipality(@Nullable String inputMunicipality) {
         return (root, query, cb) -> {
+            if (inputMunicipality == null) {
+                return cb.conjunction();
+            }
             // Joining the jobDefinitions association
             Join<JobPost, JobDefinition> joinJobDescriptions = root.join("jobDefinitions");
 
@@ -131,8 +147,12 @@ public class JobPostSpecifications {
      * @return          A Specification object representing the condition.
      * @see JobPost
      */
-    public static Specification<JobPost> hasSector(String sector) {
+    public static Specification<JobPost> hasSector(@Nullable String sector) {
         return (root, query, cb) -> {
+            if (sector == null) {
+                return cb.conjunction();
+            }
+
             Join<JobPost, JobDefinition> joinJobDescription = root.join("jobDefinitions");
 
             String finalSectorValue = sector.toLowerCase();
@@ -151,8 +171,12 @@ public class JobPostSpecifications {
      * @return          A Specification object representing the condition.
      * @see JobPost
      */
-    public static Specification<JobPost> hasDeadline(String deadline) {
+    public static Specification<JobPost> hasDeadline(@Nullable String deadline) {
         return (root, query, cb) -> {
+            if (deadline == null) {
+                return cb.conjunction();
+            }
+
             Predicate hasDeadline = cb.isNotNull(root.get("deadline"));
             Predicate doesNotHaveDeadline = cb.isNull(root.get("deadline"));
             Predicate deadlineNotPassed = cb.greaterThanOrEqualTo(root.get("deadline"), LocalDate.now());

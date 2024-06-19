@@ -1,7 +1,6 @@
 package no.jobbscraper.jobpostapi.jobpost;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import no.jobbscraper.jobpostapi.response.Response;
 import no.jobbscraper.jobpostapi.response.ResponseUtil;
 import org.springframework.data.domain.Page;

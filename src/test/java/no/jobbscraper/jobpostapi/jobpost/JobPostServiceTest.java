@@ -14,8 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quickperf.junit5.QuickPerfTest;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -27,7 +25,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,15 +62,13 @@ class JobPostServiceTest {
 
         List<JobPost> jobPosts = JobPostUtil.getJobPosts(faker.random().nextInt(15, 30));
 
-        Page<JobPost> jobPostPage = new PageImpl<>(jobPosts);
-
         // When
-        when(jobPostRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(jobPostPage);
+        when(jobPostRepository.findAll(any(Specification.class))).thenReturn(jobPosts);
 
         // Then
         Page<JobPostDto> response = underTest.getAllJobPosts(jobPostGetRequest, page, size);
 
-        assertThat(response.getTotalElements()).isEqualTo(jobPosts.size());
+        assertThat(response.getTotalElements()).isEqualTo(size);
     }
 
     @Test

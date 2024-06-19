@@ -34,3 +34,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate.query.fail_on_pagination_over_collection_fetch: true
+      hibernate.format_sql: false

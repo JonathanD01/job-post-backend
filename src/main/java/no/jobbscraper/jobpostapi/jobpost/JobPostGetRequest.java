@@ -1,9 +1,7 @@
 package no.jobbscraper.jobpostapi.jobpost;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.Null;
-import org.springframework.web.bind.annotation.RequestParam;
 
 public record JobPostGetRequest(
         @Nullable

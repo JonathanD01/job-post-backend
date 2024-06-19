@@ -65,7 +65,7 @@ class JobPostIntegrationTest  {
 
     @Test
     @DisplayName("It should get a list of jobposts that are ordered by deadline in desc order")
-    @ExpectSelect(2)
+    @ExpectSelect
     void itShouldGetAllJobPosts() {
         // Given
         int page = 0;
@@ -74,7 +74,7 @@ class JobPostIntegrationTest  {
         // When
         // Then
         webTestClient.method(HttpMethod.GET)
-                .uri(JOB_POST_PAH + "?page={page}&size={size}", page, size)
+                .uri(JOB_POST_PAH + "?page={page}&size={size}&plassering", page, size)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -92,7 +92,7 @@ class JobPostIntegrationTest  {
 
     @Test
     @DisplayName("It should return a no content response if jobposts are empty")
-    @ExpectSelect(2)
+    @ExpectSelect
     void itShouldNotGetAllJobPosts() {
         // Given
         int page = faker.random().nextInt(10, 20);

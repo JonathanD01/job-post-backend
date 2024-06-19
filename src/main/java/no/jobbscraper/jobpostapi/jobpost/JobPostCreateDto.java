@@ -1,8 +1,10 @@
 package no.jobbscraper.jobpostapi.jobpost;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
+import no.jobbscraper.jobpostapi.deserializer.CustomJobDefinitionDeserializer;
 import no.jobbscraper.jobpostapi.jobdefinition.JobDefinition;
 import no.jobbscraper.jobpostapi.jobtag.JobTag;
 
@@ -43,6 +45,7 @@ public record JobPostCreateDto(
         Set<JobTag> jobTags,
 
         @JsonProperty("job_definitions")
+        @JsonDeserialize(using = CustomJobDefinitionDeserializer.class)
         @Nullable
         Set<JobDefinition> jobDefinitions) {
 
