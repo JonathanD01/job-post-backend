@@ -14,7 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quickperf.junit5.QuickPerfTest;
 import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -39,6 +40,8 @@ class JobPostServiceTest {
     @Mock
     private JobPostRepository jobPostRepository;
     @Mock
+    private JobPostRepositoryCustom jobPostRepositoryCustom;
+    @Mock
     private JobTagRepository jobTagRepository;
     @Mock
     private JobDefinitionRepository jobDefinitionRepository;
@@ -59,14 +62,19 @@ class JobPostServiceTest {
                 new JobPostGetRequest(null, null, null, null, null);
         int page = 0;
         int size = 12;
+        PageRequest pageRequest = PageRequest.of(page, size);
 
         List<JobPost> jobPosts = JobPostUtil.getJobPosts(faker.random().nextInt(15, 30));
+        var jobPostDtos = jobPosts.stream().map(jobPostDTOMapper).toList();
+
+        var jobPostPage = new PageImpl<>(jobPostDtos, pageRequest, jobPostDtos.size());
 
         // When
-        when(jobPostRepository.findAll(any(Specification.class))).thenReturn(jobPosts);
+        when(jobPostRepositoryCustom.findAll(jobPostGetRequest, pageRequest))
+                .thenReturn(jobPostPage);
 
         // Then
-        Page<JobPostDto> response = underTest.getAllJobPosts(jobPostGetRequest, page, size);
+        Page<JobPostDto> response = underTest.getAllJobPosts(jobPostGetRequest, pageRequest);
 
         assertThat(response.isEmpty()).isFalse();
     }

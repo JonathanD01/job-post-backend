@@ -8,14 +8,10 @@ import no.jobbscraper.jobpostapi.jobdefinition.JobDefinitionRepository;
 import no.jobbscraper.jobpostapi.jobtag.JobTag;
 import no.jobbscraper.jobpostapi.jobtag.JobTagRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.support.PagedListHolder;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +22,7 @@ import java.util.stream.Collectors;
 public class JobPostService {
 
     private final JobPostRepository jobPostRepository;
+    private final JobPostRepositoryCustom jobPostRepositoryCustom;
     private final JobTagRepository jobTagRepository;
     private final JobDefinitionRepository jobDefinitionRepository;
     private final JobPostDtoMapper jobPostDTOMapper;
@@ -34,10 +31,12 @@ public class JobPostService {
     private String secretKey;
 
     public JobPostService(JobPostRepository jobPostRepository,
+                          JobPostRepositoryCustom jobPostRepositoryCustom,
                           JobTagRepository jobTagRepository,
                           JobDefinitionRepository jobDefinitionRepository,
                           JobPostDtoMapper jobPostDTOMapper) {
         this.jobPostRepository = jobPostRepository;
+        this.jobPostRepositoryCustom = jobPostRepositoryCustom;
         this.jobTagRepository = jobTagRepository;
         this.jobDefinitionRepository = jobDefinitionRepository;
         this.jobPostDTOMapper = jobPostDTOMapper;
@@ -47,40 +46,14 @@ public class JobPostService {
      * Retrieves a page of job posts based on the given criteria.
      *
      * @param jobPostGetRequest The request containing the search criteria.
-     * @param page              The page number to retrieve.
-     * @param size              The size of each page.
+     * @param pageable          Pageable object
      * @return                  A page of job posts.
      * @see Page
      * @see JobPostDto
      */
     @Transactional
-    public Page<JobPostDto> getAllJobPosts(JobPostGetRequest jobPostGetRequest, int page, int size) {
-        var finalSpecification = hasUrlSpecification(
-                addDescriptionSpecification(jobPostGetRequest)
-                        .and(addPositionSpecification(jobPostGetRequest))
-                        .and(addSectorSpecification(jobPostGetRequest))
-                        .and(addMunicipalitySpecification(jobPostGetRequest))
-                        .and(addDeadlineSpecification(jobPostGetRequest))
-        );
-        // Fixes HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
-        // by not using a pageable on query. Instead, brute force a pagination!
-        List<JobPost> jobPosts = jobPostRepository.findAll(finalSpecification);
-
-        PagedListHolder<JobPost> pagedListHolder = new PagedListHolder<>(jobPosts);
-        pagedListHolder.setPage(page);
-        pagedListHolder.setPageSize(size);
-
-        var totalPages = pagedListHolder.getPageCount();
-
-        // It seems like PagedListHolder always returns the last page no matter what
-        if (page > totalPages) {
-            return new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), 0);
-        }
-        List<JobPostDto> dtoList = pagedListHolder.getPageList().stream()
-                .map(jobPostDTOMapper)
-                .toList();
-
-        return new PageImpl<>(dtoList, PageRequest.of(page, size), jobPosts.size());
+    public Page<JobPostDto> getAllJobPosts(JobPostGetRequest jobPostGetRequest, Pageable pageable) {
+        return jobPostRepositoryCustom.findAll(jobPostGetRequest, pageable);
     }
 
     /**
@@ -121,75 +94,6 @@ public class JobPostService {
                 .map(jobPostRepository::save)
                 .map(JobPost::getId)
                 .toList();
-    }
-
-    /**
-     * Ensures all {@link JobPost} returned have an url set.
-     *
-     * @return The base specification.
-     * @see JobPost
-     */
-    private Specification<JobPost> hasUrlSpecification(Specification<JobPost> specification) {
-        return JobPostSpecifications.hasUrl(specification);
-    }
-
-    /**
-     * Adds description specifications to the base specification.
-     *
-     * @param jobPostGetRequest The request containing the query.
-     * @return                  The updated specification.
-     * @see JobPost
-     */
-    private Specification<JobPost> addDescriptionSpecification(JobPostGetRequest jobPostGetRequest) {
-        return JobPostSpecifications.hasDescription(jobPostGetRequest.query());
-    }
-
-    /**
-     * Adds position specification to the base specification.
-     *
-     * @param jobPostGetRequest The request containing the position.
-     * @return                  The updated specification.
-     * @see JobPost
-     */
-    private Specification<JobPost> addPositionSpecification(JobPostGetRequest jobPostGetRequest) {
-        return JobPostSpecifications.hasPosition(jobPostGetRequest.position());
-    }
-
-    /**
-     * Adds sector specification to the base specification.
-     *
-     * @param jobPostGetRequest The request containing the sector.
-     * @return                  The updated specification.
-     * @see JobPost
-     */
-    private Specification<JobPost> addSectorSpecification(JobPostGetRequest jobPostGetRequest) {
-        return JobPostSpecifications.hasSector(jobPostGetRequest.sector());
-    }
-
-    /**
-     * Adds municipality specification to the base specification.
-     *
-     * @param jobPostGetRequest The request containing the municipality.
-     * @return                  The updated specification.
-     * @see JobPost
-     */
-    private Specification<JobPost> addMunicipalitySpecification(JobPostGetRequest jobPostGetRequest) {
-        return JobPostSpecifications.isInMunicipality(jobPostGetRequest.municipality());
-    }
-
-    /**
-     * Adds deadline specification to the base specification.
-     *
-     * @param jobPostGetRequest The request containing the deadline.
-     * @return                  The updated specification.
-     * @see JobPost
-     */
-    private Specification<JobPost> addDeadlineSpecification(JobPostGetRequest jobPostGetRequest) {
-        if (jobPostGetRequest.deadline() != null) {
-            return JobPostSpecifications.hasDeadline(jobPostGetRequest.deadline());
-        } else {
-            return JobPostSpecifications.hasDeadlineNotPassed();
-        }
     }
 
     /**

@@ -8,14 +8,13 @@ import no.jobbscraper.jobpostapi.jobtag.JobTag;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public record JobPostDto(
         Long id,
         @JsonProperty("created_at")
-        Date createdAt,
+        LocalDate createdAt,
         String url,
         @JsonProperty("company_name")
         String companyName,

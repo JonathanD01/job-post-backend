@@ -5,7 +5,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
 import no.jobbscraper.jobpostapi.jobdefinition.JobDefinition;
 import no.jobbscraper.jobpostapi.jobtag.JobTag;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -20,9 +20,10 @@ public class JobPost {
     @Column(name = "jobpost_id")
     private Long id;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Date createdAt;
+    private LocalDate createdAt;
 
     private String url;
 
@@ -80,7 +81,7 @@ public class JobPost {
         this.jobDefinitions = jobDefinitions;
     }
 
-    public JobPost(Long id, Date createdAt, String url, String companyName, String companyImageUrl, String imageUrl, String title, String description, LocalDate deadline, Set<JobTag> jobTags, Set<JobDefinition> jobDefinitions) {
+    public JobPost(Long id, LocalDate createdAt, String url, String companyName, String companyImageUrl, String imageUrl, String title, String description, LocalDate deadline, Set<JobTag> jobTags, Set<JobDefinition> jobDefinitions) {
         this.id = id;
         this.createdAt = createdAt;
         this.url = url;
@@ -98,7 +99,7 @@ public class JobPost {
         return id;
     }
 
-    public Date getCreatedAt() {
+    public LocalDate getCreatedAt() {
         return createdAt;
     }
 

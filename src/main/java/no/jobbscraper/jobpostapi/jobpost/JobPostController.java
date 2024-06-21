@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import no.jobbscraper.jobpostapi.response.Response;
 import no.jobbscraper.jobpostapi.response.ResponseUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,17 +26,15 @@ public class JobPostController {
      * Retrieves a paginated list of job posts based on the provided criteria.
      *
      * @param jobPostGetRequest The criteria for filtering job posts.
-     * @param page              The page number for pagination.
-     * @param size              The number of job posts per page.
+     * @param pageable          Pageable object
      * @return                  A ResponseEntity containing a Response object with the paginated list of job posts.
      */
     @GetMapping
     public ResponseEntity<Response<Page<JobPostDto>>> getAllJobPosts(
             @ModelAttribute JobPostGetRequest jobPostGetRequest,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "12") int size
+            Pageable pageable
     ) {
-        Page<JobPostDto> jobPosts = jobPostService.getAllJobPosts(jobPostGetRequest, page, size);
+        Page<JobPostDto> jobPosts = jobPostService.getAllJobPosts(jobPostGetRequest, pageable);
 
         if (jobPosts.isEmpty()) {
             return ResponseEntity.noContent().build();
