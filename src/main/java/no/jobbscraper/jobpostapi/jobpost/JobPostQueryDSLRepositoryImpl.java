@@ -35,15 +35,15 @@ public class JobPostQueryDSLRepositoryImpl extends QuerydslRepositorySupport imp
         JPQLQuery<Long> idQuery = from(jobPostTable)
                 .select(jobPostTable.id)
                 .where(filterPredicate(jobPostGetRequest))
-                .orderBy(orderPredicate(jobPostGetRequest.deadline()))
-                .limit(50L);
+                .orderBy(orderPredicate(jobPostGetRequest.deadline()));
 
         // Apply pagination to the ID query
         long total = idQuery.fetchCount();
 
         List<Long> jobPostIds = idQuery
-                .offset(pageable.getOffset())
+                .orderBy(orderPredicate(jobPostGetRequest.deadline()))
                 .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
                 .fetch();
 
         // Fetch JobPosts by IDs
