@@ -6,13 +6,19 @@ cors:
   allowed-headers: "*"
   exposed-headers: "*"
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["prometheus"]
+
 server:
   error:
     include-message: always
     include-binding-errors: always
 spring:
   flyway:
-    enabled: true
+    enabled: false
     baseline-on-migrate: true
     baseline-version: '0'
     url: jdbc:postgresql://localhost:5431/testdb
