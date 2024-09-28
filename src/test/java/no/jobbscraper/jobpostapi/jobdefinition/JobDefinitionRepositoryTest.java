@@ -26,7 +26,6 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TE
 @DirtiesContext
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = {PostgreSQLContainerInitializer.class})
-@ActiveProfiles("test")
 @Sql(value = "/test-data.sql", executionPhase = BEFORE_TEST_CLASS)
 @QuickPerfTest
 class JobDefinitionRepositoryTest {

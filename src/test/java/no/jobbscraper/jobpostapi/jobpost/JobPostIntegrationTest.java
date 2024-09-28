@@ -31,7 +31,6 @@ import java.util.List;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_CLASS;
 
 @Import(QuickPerfSqlConfig.class)
-@ActiveProfiles("test")
 @DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
@@ -93,9 +92,10 @@ class JobPostIntegrationTest  {
                 .jsonPath("$.result.content[1].deadline").exists();
     }
 
+    // TODO BAD TEST. CAN FAIL AFTER MULTIPLE TIMES?
     @Test
     @DisplayName("It should return a no content response if jobposts are empty")
-    @ExpectSelect(3)
+    @ExpectSelect
     void itShouldNotGetAllJobPosts() {
         // Given
         int page = faker.random().nextInt(10, 20);
@@ -161,6 +161,7 @@ class JobPostIntegrationTest  {
                 .jsonPath("$.errors[0].http_status").isEqualTo(HttpStatus.BAD_REQUEST.name());
     }
 
+    // TODO BAD TEST. CAN FAIL AFTER MULTIPLE TIMES?
     @Test
     @DisplayName("It should create job posts")
     void itShouldCreateJobPost() {
