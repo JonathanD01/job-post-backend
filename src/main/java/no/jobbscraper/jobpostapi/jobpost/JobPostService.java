@@ -166,4 +166,5 @@ public class JobPostService {
         Optional<JobDefinition> jobDefinitionOptional = jobDefinitionRepository.findByKeyAndValue(key, value);
         return jobDefinitionOptional.orElseGet(() -> new JobDefinition(key, value));
     }
+
 }

@@ -8,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManager;
 import no.jobbscraper.jobpostapi.jobdefinition.QJobDefinition;
+import no.jobbscraper.jobpostapi.sql.QueryDslFullTextUtils;
 import no.jobbscraper.jobpostapi.util.GeoUtil;
 
 import java.time.LocalDate;
@@ -48,7 +49,7 @@ public class JobPostPredicates {
      * @return BooleanExpression to filter job posts based on the specific deadline condition, or null if deadline is null.
      */
     public static BooleanExpression hasSpecificDeadline(@Nullable String deadline) {
-        if (deadline == null) {
+        if (deadline == null || deadline.isBlank()) {
             return null;
         }
 
@@ -92,7 +93,7 @@ public class JobPostPredicates {
     public static OrderSpecifier<LocalDate> orderBySpecificDeadline(@Nullable String deadline) {
         var jobPostTable = QJobPost.jobPost;
 
-        if (deadline == null) {
+        if (deadline == null || deadline.isBlank()) {
             return jobPostTable.createdAt.desc();
         }
 
@@ -111,14 +112,14 @@ public class JobPostPredicates {
      * @return BooleanExpression to filter job posts, or null if query is null.
      */
     public static BooleanExpression isQueryInTitleOrDescription(@Nullable String query) {
-        if (query == null) {
+        if (query == null || query.isBlank()) {
             return null;
         }
 
-        var jobPostTable = QJobPost.jobPost;
+        QJobPost jobPostTable = QJobPost.jobPost;
 
-        return jobPostTable.title.containsIgnoreCase(query)
-                .or(jobPostTable.description.containsIgnoreCase(query));
+        return QueryDslFullTextUtils.fullTextMatch(jobPostTable.title, query)
+            .or(QueryDslFullTextUtils.fullTextMatch(jobPostTable.description, query));
     }
 
     /**
@@ -130,7 +131,7 @@ public class JobPostPredicates {
      * @return BooleanExpression to filter job posts, or null if key or value is null.
      */
     public static BooleanExpression hasPosition(EntityManager entityManager, String municipality) {
-        if (municipality == null) {
+        if (municipality == null || municipality.isBlank()) {
             return null;
         }
 
@@ -171,7 +172,10 @@ public class JobPostPredicates {
      * @return BooleanExpression to filter job posts, or null if key or value is null.
      */
     public static BooleanExpression hasJobDefinition(EntityManager entityManager, String key, String value) {
-        if (key == null || value == null) {
+        if (key == null ||
+            value == null ||
+            key.isBlank() ||
+            value.isBlank()) {
             return null;
         }
 

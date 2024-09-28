@@ -6,9 +6,9 @@ import com.querydsl.jpa.JPQLQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -31,33 +31,31 @@ public class JobPostQueryDSLRepositoryImpl extends QuerydslRepositorySupport imp
     public Page<JobPostDto> findAll(JobPostGetRequest jobPostGetRequest, Pageable pageable) {
         var jobPostTable = QJobPost.jobPost;
 
-        // Fetch JobPost IDs with the criteria
-        JPQLQuery<Long> idQuery = from(jobPostTable)
-                .select(jobPostTable.id)
-                .where(filterPredicate(jobPostGetRequest))
-                .orderBy(orderPredicate(jobPostGetRequest.deadline()), jobPostTable.id.asc());
+        List<Long> jobPostIds = from(jobPostTable)
+            .select(jobPostTable.id)
+            .where(filterPredicate(jobPostGetRequest))
+            .orderBy(orderPredicate(jobPostGetRequest.deadline()), jobPostTable.id.asc())
+            .limit(pageable.getPageSize())
+            .offset(pageable.getOffset())
+            .fetch();
 
-        // Apply pagination to the ID query
-        long total = idQuery.fetchCount();
+        if (jobPostIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
 
-        List<Long> jobPostIds = idQuery
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .fetch();
-
-        // Fetch JobPosts by IDs
         List<JobPost> jobPosts = from(jobPostTable)
-                .leftJoin(jobPostTable.jobTags).fetchJoin()
-                .leftJoin(jobPostTable.jobDefinitions).fetchJoin()
-                .where(jobPostTable.id.in(jobPostIds))
-                .orderBy(orderPredicate(jobPostGetRequest.deadline()), jobPostTable.id.asc())
-                .fetch();
+            .leftJoin(jobPostTable.jobTags).fetchJoin()
+            .leftJoin(jobPostTable.jobDefinitions).fetchJoin()
+            .where(jobPostTable.id.in(jobPostIds))
+            .orderBy(orderPredicate(jobPostGetRequest.deadline()), jobPostTable.id.asc())
+            .fetch();
 
         var jobPostDtos = jobPosts.stream()
                 .map(jobPostDtoMapper)
                 .toList();
 
-        return new PageImpl<>(jobPostDtos, pageable, total);
+        return PageableExecutionUtils
+            .getPage(jobPostDtos, pageable, () -> countQuery(jobPostGetRequest).fetchOne());
     }
 
     private OrderSpecifier<LocalDate> orderPredicate(String deadline) {
@@ -65,6 +63,13 @@ public class JobPostQueryDSLRepositoryImpl extends QuerydslRepositorySupport imp
             return JobPostPredicates.orderBySpecificDeadline(deadline);
         }
         return JobPostPredicates.orderByClosestDeadline();
+    }
+
+    private JPQLQuery<Long> countQuery(JobPostGetRequest jobPostGetRequest) {
+        var jobPostTable = QJobPost.jobPost;
+        return from(jobPostTable)
+            .select(jobPostTable.count())
+            .where(filterPredicate(jobPostGetRequest));
     }
 
     private Predicate filterPredicate(JobPostGetRequest jobPostGetRequest) {
