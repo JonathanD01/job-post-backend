@@ -18,6 +18,6 @@ public class PostgresFunctionContributor implements FunctionContributor {
 
         functionContributions
             .getFunctionRegistry()
-            .registerPattern("ftsMatch","?1 @@ to_tsquery(?2)", resolveType);
+            .registerPattern("ftsMatch","?1 @@ plainto_tsquery(?2)", resolveType);
     }
 }
