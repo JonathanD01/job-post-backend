@@ -118,8 +118,7 @@ public class JobPostPredicates {
 
         QJobPost jobPostTable = QJobPost.jobPost;
 
-        return QueryDslFullTextUtils.fullTextMatch(jobPostTable.title, query)
-            .or(QueryDslFullTextUtils.fullTextMatch(jobPostTable.description, query));
+        return QueryDslFullTextUtils.fullTextMatch(jobPostTable.tsvDocument, query);
     }
 
     /**

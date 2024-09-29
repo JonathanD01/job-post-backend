@@ -41,6 +41,12 @@ public class JobPost {
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate deadline;
 
+    @Column(name = "tsv_document",
+            columnDefinition = "tsvector",
+            insertable = false,
+            updatable = false)
+    private String tsvDocument;
+
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             fetch = FetchType.LAZY)
     @JoinTable(name = "j_jobpost_tags",
